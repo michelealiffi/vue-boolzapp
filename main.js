@@ -1,7 +1,10 @@
-const {createApp} = Vue
+const { createApp } = Vue
 createApp ({
     data () {
-        return{
+        return {
+            activeChat: 0,
+            search: '',
+
             contacts: [
                 {name: 'Michele',
                 avatar: './img/avatar_1.jpg',
@@ -112,15 +115,50 @@ createApp ({
                     {date: '10/01/2020 15:51:00',
                     message: 'OK!!',
                     status: 'received'}
-                    ],
+                        ],
                 },
             ],
         }
     },
 
     methods: {
-            showChat(index){
-                this.activeChat = index;
+        showChat(index) {
+            this.activeChat = index;
         },
+        whatTime(date) {
+            const dateTimeParts = date.split(' ');
+            const timePart = dateTimeParts[1];
+            const timeParts = timePart.split(':');
+            const hours = timeParts[0];
+            const minutes = timeParts[1];
+            const result = hours + ':' + minutes;
+            return result;
+        },
+        addMsg(msg, showedchat) {
+            if(msg ===  undefined || msg === '') {
+
+            } else {
+            let currentdate = new Date();
+
+            currentdate = currentdate.getDate()+'/'+currentdate.getMonth()+'/'+currentdate.getFullYear()+' '+(('0'+currentdate.getHours()).slice(-2))+':'+(('0'+currentdate.getMinutes()).slice(-2))+':'+currentdate.getSeconds();
+            this.contacts[showedchat].messages.push({date: currentdate, message: msg, status: 'sent'});
+
+            setTimeout(() => {this.contacts[showedchat].messages.push({date: currentdate, message: 'Ok', status: 'received'})}, 1000);
+            this.newMsg = '';
+            }
+        },
+        searchChat() {
+            for(let i = 0; i < this.contacts.length; i++) {
+                if(this.contacts[i].name.toLowerCase().includes(this.search.toLowerCase())) {
+                    this.contacts[i].visible = true;
+                } else {
+                    this.contacts[i].visible = false;
+                }
+            }
+        },
+        deleteMsg(msg) {
+            const messageIndex = this.contacts[this.activeChat].messages.indexOf(msg);
+            this.contacts[this.activeChat].messages.splice(messageIndex, 1);
+        }
     },
 }).mount ("#app")
